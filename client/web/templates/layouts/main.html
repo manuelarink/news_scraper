@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News Client</title>
+    <link rel="stylesheet" type="text/css" href="static/lib/skeleton/normalize.css">
+    <link rel="stylesheet" type="text/css" href="static/lib/skeleton/skeleton.css">
+    <link rel="stylesheet" type="text/css" href="static/lib/style.css">
+</head>
+<body>
+    <h1>News Datenbank und Auswertung</h1>
+    <div class="container">
+        <ul class="navigation">
+            <li class="navigation-item"><a href="/">Home</a></li>
+            <li class="navigation-item"><a href="/list">News-Archiv</a></li>
+            <li class="navigation-item"><a href="/statistics">Auswertungen</a></li>
+        </ul>
+        <div style="clear: both;">&nbsp;</div>
+    </div>
+
+    {% block content %}{% endblock %}
+</body>
+</html>
