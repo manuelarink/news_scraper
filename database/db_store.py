@@ -12,7 +12,7 @@ def connect(**kwargs) -> sqlalchemy.engine.mock.MockConnection:
     :param kwargs:
     :return:
     '''
-    engine = create_engine("postgresql+psycopg2://news:news@localhost:5432/news")
+    engine = create_engine(kwargs['database_url'])
     return engine.connect()
 
 
@@ -73,9 +73,18 @@ def store_to_db(conn: sqlalchemy.engine.mock.MockConnection, dataframe: pd.DataF
     # set primary key
     conn.execute('ALTER TABLE headlines ADD PRIMARY KEY (index);')
 
+def disconnect(conn:sqlalchemy.engine.mock.MockConnection) -> None:
+    '''
+    Disconnects from db.
+    :return:
+    '''
+    conn.close()
+
 
 if __name__ == '__main__':
-    conn = connect()
+    database_url = {'database_url':
+                    "postgresql+psycopg2://news:news@localhost:5432/news"}
+    conn = connect(**database_url)
     path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/data/')
     df = get_dataframe_from_csv(path)
     store_to_db(conn, df)
