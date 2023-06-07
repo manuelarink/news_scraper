@@ -1,4 +1,4 @@
-__all__ = ["main", "RSSNewsReader", "NewsItem"]
+__all__ = ["RSSNewsReader", "NewsItem"]
 
 from .NewsItem import NewsItem
 from .RSSNewsReader import RSSNewsReader

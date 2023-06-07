@@ -1,6 +1,11 @@
 import pytest
 from rssreader import NewsItem
+import sys
+from copy import deepcopy
+from dateutil.parser import parse
 
+#@pytest.mark.skip('Skipped for no reason')
+#@pytest.mark.skipif(pytest.__version__ < '5.5.0', reason='just as example for contiional skipping')
 @pytest.mark.newsItem
 @pytest.mark.parametrize('date, description, url, author, title, text, category, copyright, source',
                          [('2022-07-04 13:27:38',
@@ -30,4 +35,12 @@ def test_should_init_news_item_with_attrs(date, description, url, author, title,
     assert newsItem.copyright == copyright
     assert newsItem.source == source
 
+@pytest.mark.newsItem
+def test_items_should_be_equal(input_news_item):
+    """
+    test of correct implementation of NewsItem.__eq__ function
+    """
+    newsItem1 = input_news_item
+    newsItem2 = deepcopy(input_news_item)
 
+    assert newsItem1 == newsItem2
