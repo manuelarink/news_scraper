@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 
-def connect(**kwargs) -> sqlalchemy.engine.mock.MockConnection:
+def connect(**kwargs) -> sqlalchemy.engine.base.Connection:
     '''
     Establishes the db connection.
     :param kwargs:
@@ -16,19 +16,17 @@ def connect(**kwargs) -> sqlalchemy.engine.mock.MockConnection:
     return engine.connect()
 
 
-def get_dataframe_from_csv(dir_path: Path) -> pd.DataFrame:
+def load_data(csv_file: Path) -> pd.DataFrame:
     '''
-    Reads all csv files and creates one concatenated dataframe with a new column Id
-    as primary key.
+    Reads csv-File into Dataframe.
+    :param csv_file:
+    :return:
     '''
-
-    df_concatenated = pd.DataFrame()
-    for csv_file in list(dir_path.rglob('*.csv')):
-
-        if csv_file.stat().st_size == 0:
-            print(f'{csv_file} empty - skipping')
-            continue
-
+    if csv_file.stat().st_size == 0:
+        # ignore empty files
+        print(f'{csv_file} empty - skipping')
+        return None
+    else:
         # read csv into pandas-dataframe
         df = pd.read_csv(csv_file, delimiter=';', quotechar='"', header=None)
         df.columns = ['Date', 'Title', 'Description', 'Author',
@@ -38,9 +36,21 @@ def get_dataframe_from_csv(dir_path: Path) -> pd.DataFrame:
         # df[['Date', 'Title', 'Description',
         #     'Author', 'Category',
         #     'Url', 'Source']].apply(lambda x: x.str.strip())
+        return df
 
-        # concatenate the dataframe to the result-dataframe
-        df_concatenated = df if df_concatenated.empty else df_concatenated.append(df, ignore_index=True)
+
+def get_dataframe_from_csv_dir(dir_path: Path) -> pd.DataFrame:
+    '''
+    Reads all csv files and creates one concatenated dataframe with a new column Id
+    as primary key.
+    '''
+
+    df_concatenated = pd.DataFrame()
+    for csv_file in list(dir_path.rglob('*.csv')):
+        data = load_data(csv_file)
+        if data is not None:
+            # concatenate the dataframe to the result-dataframe
+            df_concatenated = data if df_concatenated.empty else df_concatenated.append(data, ignore_index=True)
 
     # add a new column for the serial number
     #df_concatenated['Id'] = range(1, len(df_concatenated) + 1)
@@ -48,7 +58,7 @@ def get_dataframe_from_csv(dir_path: Path) -> pd.DataFrame:
     return df_concatenated
 
 
-def store_to_db(conn: sqlalchemy.engine.mock.MockConnection, dataframe: pd.DataFrame) -> None:
+def store_to_db(conn: sqlalchemy.engine.base.Connection, dataframe: pd.DataFrame) -> None:
     '''
     Stores data from dataframe to db by replacing the target table 'headlines'.
     :param conn:
@@ -73,7 +83,7 @@ def store_to_db(conn: sqlalchemy.engine.mock.MockConnection, dataframe: pd.DataF
     # set primary key
     conn.execute('ALTER TABLE headlines ADD PRIMARY KEY (index);')
 
-def disconnect(conn:sqlalchemy.engine.mock.MockConnection) -> None:
+def disconnect(conn:sqlalchemy.engine.base.Connection) -> None:
     '''
     Disconnects from db.
     :return:
@@ -86,5 +96,5 @@ if __name__ == '__main__':
                     "postgresql+psycopg2://news:news@localhost:5432/news"}
     conn = connect(**database_url)
     path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/data/')
-    df = get_dataframe_from_csv(path)
+    df = get_dataframe_from_csv_dir(path)
     store_to_db(conn, df)

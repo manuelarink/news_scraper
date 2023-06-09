@@ -14,13 +14,14 @@ sources = [
     {"source": "ZDF heute", "url": "https://www.zdf.de/rss/zdf/nachrichten"}
 ]
 
+
 # TODO... hier weiter testen
 # TODO: Tests mit verschiedenen Parametern von fetch
 # TODO: Test bei fehlerhafter URL
 # TODO: Test bei nicht konformem Inhalt des RSS-Files (anderer Struktur)
 # TODO: Test bei ungültigem Startdatum
 # TODO weitere Szenarien...
-def test_fetch_valid_url_start_time_none_with_mock(monkeypatch):
+def test_fetch_valid_url_start_time_none_with_mock(monkeypatch, input_news_item):
     """
     Tests fetching and processing of rss-Content by mocking request.get
     given a list of valid urls and no start_time.
@@ -43,25 +44,13 @@ def test_fetch_valid_url_start_time_none_with_mock(monkeypatch):
     # using monkeypatch to replace result of http request
     monkeypatch.setattr(requests, 'get', mock_get)
 
-    expected_first_item = NewsItem(parse('Fri, 02 Jun 2023 12:18:20 +0200'),
-                                   'China hat dazu aufgerufen, keine weiteren Waffen mehr für den Konflikt zu liefern, '
-                                   'um den Krieg beenden zu können. Laut des Gouverneurs der russischen Grenzregion Belgorod '
-                                   'sind bei einem Angriff zwei Menschen getötet worden. Die Entwicklungen im Liveblog.',
-                                   'https://www.tagesschau.de/newsticker/liveblog-ukraine-freitag-268.html',
-                                   '',
-                                   'Liveblog: ++ China fordert Stopp von Waffenlieferungen ++',
-                                   '',
-                                   '',
-                                   '',
-                                   'Focus')
-
     # Test, ob erstes item dem gewünschten Ergebnis entspricht
     rssreader = RSSNewsReader()
     for news_item in rssreader.fetch(sources):
         #print('iterating over generator')
         #print(f'generated NewsItem\n{news_item}')
-        #print(f'expected NewsItem\n {expected_first_item}')
-        assert news_item == expected_first_item
+        #print(f'expected NewsItem\n {input_news_item}')
+        assert news_item == input_news_item
         break
 
 
