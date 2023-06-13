@@ -1,15 +1,4 @@
-# Übungsprojekt Crawler
-# Anforderungen:
-#   - regelmäßiges Abrufen einer vorgegebenen News-Website (1 x täglich)
-#   - Erfassen aller Nachrichten (Überschrift, Author, Datum)
-#   - Speichern in csv-Datei (Erweiterung: Speicherung in Datenbank)
-#   - Präsentation der Daten in Flask-Anwendung
-#   - Anzeige der Daten
-#   - Generierung von Auswertungen (Stichworte, Authoren, Datum,...)
-
-
 import csv
-
 import pytz
 import os
 from datetime import datetime

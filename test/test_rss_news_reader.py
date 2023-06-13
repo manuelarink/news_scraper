@@ -1,5 +1,6 @@
 from src.rssreader import RSSNewsReader
 import requests
+import pytest
 
 sources = [
     {"source": "Focus", "url": "https://rss.focus.de/politik/"},
@@ -19,6 +20,7 @@ sources = [
 # TODO: Test bei nicht konformem Inhalt des RSS-Files (anderer Struktur)
 # TODO: Test bei ungültigem Startdatum
 # TODO weitere Szenarien...
+@pytest.mark.rss_news_reader
 def test_fetch_valid_url_start_time_none_with_mock(monkeypatch, input_news_item):
     """
     Tests fetching and processing of rss-Content by mocking request.get
