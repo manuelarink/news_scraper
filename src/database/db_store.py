@@ -29,13 +29,8 @@ def load_data(csv_file: Path) -> pd.DataFrame:
     else:
         # read csv into pandas-dataframe
         df = pd.read_csv(csv_file, delimiter=';', quotechar='"', header=None)
-        df.columns = ['Date', 'Title', 'Description', 'Author',
-                      'Category', 'Copyright', 'Url', 'Text', 'Source']
-
-        # remove whites spaces, '\n', '\t', '\r' from text cells
-        # df[['Date', 'Title', 'Description',
-        #     'Author', 'Category',
-        #     'Url', 'Source']].apply(lambda x: x.str.strip())
+        df.columns = ['date', 'title', 'description', 'author',
+                      'category', 'copyright', 'url', 'text', 'source']
         return df
 
 
@@ -65,23 +60,11 @@ def store_to_db(conn: sqlalchemy.engine.base.Connection, dataframe: pd.DataFrame
     :param dataframe:
     :return:
     '''
-    # define table schema for dataframe
-    table_schema = {'Date': sqlalchemy.DateTime,
-                    'Title': sqlalchemy.String,
-                    'Description': sqlalchemy.String,
-                    'Author': sqlalchemy.String,
-                    'Category': sqlalchemy.String,
-                    'Copyright': sqlalchemy.String,
-                    'Url': sqlalchemy.String,
-                    'Text': sqlalchemy.String,
-                    'Source': sqlalchemy.String}
-                    #'Id': sqlalchemy.BigInteger}
+    # replace table headlines
+    _replace_table(conn.engine)
+    #write data to db
+    dataframe.to_sql('headlines', con=conn, if_exists='append', index=False)
 
-    # write data to db
-    dataframe.to_sql('headlines', con=conn, if_exists='replace', dtype=table_schema, index=True)
-
-    # set primary key
-    conn.execute('ALTER TABLE headlines ADD PRIMARY KEY (index);')
 
 def disconnect(conn:sqlalchemy.engine.base.Connection) -> None:
     '''
@@ -91,10 +74,63 @@ def disconnect(conn:sqlalchemy.engine.base.Connection) -> None:
     conn.close()
 
 
+def _replace_table(engine: sqlalchemy.engine.Engine) -> None:
+    '''
+    Replaces the database table for storing the csv-dataframe to.
+    :param engine:
+    :return:
+    '''
+    table_name = 'headlines'
+
+    # drop table headlines and index sequence first
+    sql = 'DROP TABLE IF EXISTS headlines; DROP SEQUENCE IF EXISTS headlines_seq'
+    engine.execute(sql)
+
+    # create new table headlines
+    metadata = sqlalchemy.MetaData()
+    headlines = sqlalchemy.Table(
+        'headlines',
+        metadata,
+        sqlalchemy.Column(
+            'id', sqlalchemy.BigInteger,
+            sqlalchemy.Identity(start=1, cycle=False),
+            primary_key=True, unique=True
+        ),
+        sqlalchemy.Column(
+            'date', sqlalchemy.DateTime
+        ),
+        sqlalchemy.Column(
+            'title', sqlalchemy.Text
+        ),
+        sqlalchemy.Column(
+            'description', sqlalchemy.Text
+        ),
+        sqlalchemy.Column(
+            'author', sqlalchemy.Text
+        ),
+        sqlalchemy.Column(
+            'category', sqlalchemy.Text
+        ),
+        sqlalchemy.Column(
+            'copyright', sqlalchemy.Text
+        ),
+        sqlalchemy.Column(
+            'url', sqlalchemy.Text
+        ),
+        sqlalchemy.Column(
+            'text', sqlalchemy.Text
+        ),
+        sqlalchemy.Column(
+            'source', sqlalchemy.Text
+        )
+    )
+    headlines.create(engine)
+
+
 if __name__ == '__main__':
     database_url = {'database_url':
                     "postgresql+psycopg2://news:news@localhost:5432/news"}
     conn = connect(**database_url)
-    path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/data/')
+    path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/../data/')
     df = get_dataframe_from_csv_dir(path)
     store_to_db(conn, df)

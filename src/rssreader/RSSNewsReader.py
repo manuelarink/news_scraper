@@ -1,8 +1,7 @@
 import requests
-from datetime import datetime
 from dateutil.parser import parse
 from bs4 import BeautifulSoup
-from rssreader import NewsItem
+from src.rssreader import NewsItem
 
 
 class RSSNewsReader:

@@ -1,8 +1,7 @@
 import pytest
-from rssreader import NewsItem
-import sys
+from src.rssreader import NewsItem
 from copy import deepcopy
-from dateutil.parser import parse
+
 
 #@pytest.mark.skip('Skipped for no reason')
 #@pytest.mark.skipif(pytest.__version__ < '5.5.0', reason='just as example for contiional skipping')

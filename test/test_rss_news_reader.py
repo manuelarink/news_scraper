@@ -1,7 +1,5 @@
-from rssreader import RSSNewsReader
-from rssreader import NewsItem
+from src.rssreader import RSSNewsReader
 import requests
-from dateutil.parser import parse
 
 sources = [
     {"source": "Focus", "url": "https://rss.focus.de/politik/"},

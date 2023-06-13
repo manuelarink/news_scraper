@@ -1,7 +1,7 @@
 import pytest
 import sqlalchemy
 import pandas as pd
-from database import db_store
+from src.database import db_store
 
 
 @pytest.mark.db_store
@@ -35,21 +35,35 @@ def test_load_data_successful(input_data):
 
 
 @pytest.mark.db_store
+def test_load_data_empty_input_file(input_no_content):
+    '''
+    Test on correct behavior in case of emtpy csv-files.
+    :param input_no_content:
+    :return:
+    '''
+    dataframe, csv_file_path = input_no_content
+    with open(csv_file_path, 'r') as file:
+        count_rows = len(file.readlines())
+    assert dataframe is None and count_rows == 0
+
+
+@pytest.mark.db_store
 def test_load_data_content_valid(input_data):
     '''
     Test on valid content and structure of dataframe.
     :return:
     '''
     dataframe, csv_file_path = input_data
-    # assert columns are correctly set
-    assert all(dataframe.columns == ['Date', 'Title', 'Description',
-                                           'Author', 'Category', 'Copyright',
-                                           'Url', 'Text', 'Source'])
+    print(f'dataframe={dataframe}, csv_file_path={csv_file_path}')
 
-    # assert number of rows corresponds to number of lines in csv
-    with open(csv_file_path, 'r', encoding='utf-8') as file:
-        nmb_rows = len(file.readlines())
-    assert len(dataframe.index) == nmb_rows
+    # assert columns are correctly set
+    assert all(dataframe.columns == ['date', 'title', 'description',
+                                           'author', 'category', 'copyright',
+                                           'url', 'text', 'source'])
+
+    # assert correct row count
+    df = pd.read_csv(csv_file_path, delimiter=';', quotechar='"', header=None)
+    assert len(dataframe.index) == len(df.index)
 
 
 @pytest.mark.db_store
@@ -59,9 +73,21 @@ def test_get_dataframe_from_csv_concat_successful(input_csv_dir_path):
     :param input_csv_dir:
     :return:
     '''
-    # TODO: Tests on correct structure and content of dataframe
     df = db_store.get_dataframe_from_csv_dir(input_csv_dir_path)
     assert type(df) == pd.DataFrame
+
+    # assert columns are correctly set
+    assert all(df.columns == ['date', 'title', 'description',
+                              'author', 'category', 'copyright',
+                              'url', 'text', 'source'])
+
+    # assert row count of concatenated df is sum of row counts of single df's
+    row_count = 0
+    for csv_file_path in list(input_csv_dir_path.rglob('*.csv')):
+        if csv_file_path.stat().st_size > 0:
+            df_single = pd.read_csv(csv_file_path, delimiter=';', quotechar='"', header=None)
+            row_count += len(df_single.index)
+    assert len(df.index) == row_count
 
 
 @pytest.mark.skip(reason='test not really of interest - just as example')
@@ -82,3 +108,15 @@ def test_connect_to_db_fails(database_url):
     '''
     with pytest.raises(sqlalchemy.exc.SQLAlchemyError):
         con = db_store.connect(**{'database_url': database_url})
+
+
+@pytest.mark.db_store
+def test_should_create_table_headlines(setup_test_postgres_db_connected):
+    '''
+    Test on function _create_table on postgres-db. Should create table headlines, if not already existing.
+    Table should be successfully created.
+    :return:
+    '''
+    db_store._replace_table(setup_test_postgres_db_connected.engine)
+    assert sqlalchemy.inspect(setup_test_postgres_db_connected.engine).has_table('headlines')
+

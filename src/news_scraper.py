@@ -13,7 +13,7 @@ import csv
 import pytz
 import os
 from datetime import datetime
-from rssreader import RSSNewsReader, NewsItem
+from src.rssreader import RSSNewsReader
 
 
 class NewsScraper:
@@ -26,9 +26,9 @@ class NewsScraper:
         tz_berlin = pytz.timezone('Europe/Berlin')
         now = datetime.now(tz_berlin)
         str_now = now.strftime("%Y-%m-%d_%H-%M-%S")
-        ctrl_file = os.path.join(os.path.dirname(__file__), 'data', '.rss_news_reader')
+        ctrl_file = os.path.join(os.path.dirname(__file__), '../data', '.rss_news_reader')
         news_file_name = 'news-' + str_now + '.csv'
-        news_file = os.path.join(os.path.dirname(__file__), 'data', news_file_name)
+        news_file = os.path.join(os.path.dirname(__file__), '../data', news_file_name)
 
         # Ctrl-File öffnen und letzten Abruf (= Eintrag) ermitteln
         with open(ctrl_file, 'r') as ctrlfile:

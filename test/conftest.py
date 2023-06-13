@@ -1,14 +1,14 @@
 import pytest
-from rssreader import NewsItem
+from src.rssreader import NewsItem
 from dateutil.parser import parse
 from pathlib import Path
 import os
-from database import db_store
+from src.database import db_store
 
 
 @pytest.fixture(params=[{'database_url': 'sqlite:///headlines_test.db'},
                         {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news'}],
-                ids=['mock', 'production'])
+                ids=['test', 'production'])
 def setup_db_connected(request):
     '''
     Parametrized fixture for establishing a connection to a db.
@@ -22,7 +22,7 @@ def setup_db_connected(request):
 
 @pytest.fixture(params=[{'database_url': 'sqlite:///headlines_test.db'},
                         {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news'}],
-                ids=['mock', 'production'])
+                ids=['test', 'production'])
 def setup_db_disconnected(request):
     '''
     Parametrized fixture for disconnection from db.
@@ -35,15 +35,19 @@ def setup_db_disconnected(request):
 
 
 @pytest.fixture()
-def setup_db_with_mock(request):
-    """
-    Fixture zum Herstellen einer Verbindung zu einer Test-Datenbank.
-    :param request:
+def setup_test_postgres_db_connected():
+    '''
+    Fixture for establishing a connection to a test postgres-db.
     :return:
-    """
-    mock_db_url = getattr(request.module, 'mock_db_url')
-    con = db_store.connect(**mock_db_url)
+    '''
+    # connect
+    test_db_url = {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news_test'}
+    con = db_store.connect(**test_db_url)
+    # drop table headlines if exists
+    sql = 'DROP TABLE IF EXISTS headlines; DROP SEQUENCE IF EXISTS headlines_seq'
+    con.engine.execute(sql)
     yield con
+    # disconnect
     db_store.disconnect(con)
 
 
@@ -53,18 +57,32 @@ def input_csv_dir_path():
     Fixture that return path-object to directory of test-csv.files.
     :return:
     '''
-    return Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/test_data/')
+    return Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/sample_data/')
 
 
-@pytest.fixture(params=['test/test_data/news-2023-06-06_12-40-37.csv'], ids=['news-2023-06-06_12-40-37.csv'])
+@pytest.fixture(params=['test/sample_data/news-2023-06-06_12-40-37.csv',
+                        'test/sample_data/news-2023-06-07_12-03-19.csv'],
+                ids=['news-2023-06-06_12-40-37.csv',
+                     'news-2023-06-07_12-03-19.csv'])
 def input_data(request):
     '''
-    Fixture that returns a dataframe containing the input of a csv-file.
+    Fixture that returns a dataframe containing the input of a csv-file stored in and csv_file_path.
     :return:
     '''
     csv_file_path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/{request.param}')
     return db_store.load_data(csv_file_path), csv_file_path
 
+
+@pytest.fixture(params=['test/sample_data/news-2022-08-04_12-16-50.csv'],
+                ids=['no-content: news-2022-08-04_12-16-50.csv'])
+def input_no_content(request):
+    '''
+    Fixture for providing test-input when working with empty csv-files.
+    :param request:
+    :return:
+    '''
+    csv_file_path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/{request.param}')
+    return db_store.load_data(csv_file_path), csv_file_path
 
 @pytest.fixture()
 def input_news_item(request):
