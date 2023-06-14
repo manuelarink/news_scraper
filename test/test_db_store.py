@@ -1,10 +1,10 @@
 import pytest
 import sqlalchemy
 import pandas as pd
-from src.database import db_store
+from src.database import db_helper
 
 
-@pytest.mark.db_store
+@pytest.mark.db_helper
 def test_connect_to_db_successful(setup_db_connected):
     '''
     Test on successful connecting to db.
@@ -14,7 +14,7 @@ def test_connect_to_db_successful(setup_db_connected):
     assert type(setup_db_connected) == sqlalchemy.engine.base.Connection
 
 
-@pytest.mark.db_store
+@pytest.mark.db_helper
 def test_disconnect_to_db_successful(setup_db_disconnected):
     '''
     Test on successful disconnecting from db.
@@ -24,7 +24,7 @@ def test_disconnect_to_db_successful(setup_db_disconnected):
     assert setup_db_disconnected.closed
 
 
-@pytest.mark.db_store
+@pytest.mark.db_helper
 def test_load_data_successful(input_data):
     '''
     Test on successful loading of csv-file into a dataframe.
@@ -34,7 +34,7 @@ def test_load_data_successful(input_data):
     assert type(dataframe) == pd.DataFrame
 
 
-@pytest.mark.db_store
+@pytest.mark.db_helper
 def test_load_data_empty_input_file(input_no_content):
     '''
     Test on correct behavior in case of emtpy csv-files.
@@ -47,7 +47,7 @@ def test_load_data_empty_input_file(input_no_content):
     assert dataframe is None and count_rows == 0
 
 
-@pytest.mark.db_store
+@pytest.mark.db_helper
 def test_load_data_content_valid(input_data):
     '''
     Test on valid content and structure of dataframe.
@@ -66,14 +66,14 @@ def test_load_data_content_valid(input_data):
     assert len(dataframe.index) == len(df.index)
 
 
-@pytest.mark.db_store
+@pytest.mark.db_helper
 def test_get_dataframe_from_csv_concat_successful(input_csv_dir_path):
     '''
     Test on successful creation of a concatenated dataframe of all csv-Files in input_csv_dir.
     :param input_csv_dir:
     :return:
     '''
-    df = db_store.get_dataframe_from_csv_dir(input_csv_dir_path)
+    df = db_helper.get_dataframe_from_csv_dir(input_csv_dir_path)
     assert type(df) == pd.DataFrame
 
     # assert columns are correctly set
@@ -91,7 +91,7 @@ def test_get_dataframe_from_csv_concat_successful(input_csv_dir_path):
 
 
 @pytest.mark.skip(reason='test not really of interest - just as example')
-@pytest.mark.db_store
+@pytest.mark.db_helper
 @pytest.mark.parametrize('database_url',
                          ['unknown_dialect+psycopg2://news:news@localhost:5432/news',
                           'postgresql+unknown_dbapi://news:news@localhost:5432/news',
@@ -107,16 +107,16 @@ def test_connect_to_db_fails(database_url):
     :return:
     '''
     with pytest.raises(sqlalchemy.exc.SQLAlchemyError):
-        con = db_store.connect(**{'database_url': database_url})
+        con = db_helper.connect(**{'database_url': database_url})
 
 
-@pytest.mark.db_store
+@pytest.mark.db_helper
 def test_should_create_table_headlines(setup_test_postgres_db_connected):
     '''
     Test on function _create_table on postgres-db. Should create table headlines, if not already existing.
     Table should be successfully created.
     :return:
     '''
-    db_store._replace_table(setup_test_postgres_db_connected.engine)
+    db_helper._replace_table(setup_test_postgres_db_connected.engine)
     assert sqlalchemy.inspect(setup_test_postgres_db_connected.engine).has_table('headlines')
 

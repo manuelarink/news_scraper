@@ -3,7 +3,7 @@ from src.rssreader import NewsItem
 from dateutil.parser import parse
 from pathlib import Path
 import os
-from src.database import db_store
+from src.database import db_helper
 
 
 @pytest.fixture(params=[{'database_url': 'sqlite:///headlines_test.db'},
@@ -15,9 +15,9 @@ def setup_db_connected(request):
     :param request:
     :return:
     '''
-    con = db_store.connect(**request.param)
+    con = db_helper.connect(**request.param)
     yield con
-    db_store.disconnect(con)
+    db_helper.disconnect(con)
 
 
 @pytest.fixture(params=[{'database_url': 'sqlite:///headlines_test.db'},
@@ -29,8 +29,8 @@ def setup_db_disconnected(request):
     :param request:
     :return:
     '''
-    con = db_store.connect(**request.param)
-    db_store.disconnect(con)
+    con = db_helper.connect(**request.param)
+    db_helper.disconnect(con)
     yield con
 
 
@@ -42,13 +42,13 @@ def setup_test_postgres_db_connected():
     '''
     # connect
     test_db_url = {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news_test'}
-    con = db_store.connect(**test_db_url)
+    con = db_helper.connect(**test_db_url)
     # drop table headlines if exists
     sql = 'DROP TABLE IF EXISTS headlines; DROP SEQUENCE IF EXISTS headlines_seq'
     con.engine.execute(sql)
     yield con
     # disconnect
-    db_store.disconnect(con)
+    db_helper.disconnect(con)
 
 
 @pytest.fixture()
@@ -70,7 +70,7 @@ def input_data(request):
     :return:
     '''
     csv_file_path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/{request.param}')
-    return db_store.load_data(csv_file_path), csv_file_path
+    return db_helper.load_data(csv_file_path), csv_file_path
 
 
 @pytest.fixture(params=['test/sample_data/news-2022-08-04_12-16-50.csv'],
@@ -82,7 +82,7 @@ def input_no_content(request):
     :return:
     '''
     csv_file_path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/{request.param}')
-    return db_store.load_data(csv_file_path), csv_file_path
+    return db_helper.load_data(csv_file_path), csv_file_path
 
 @pytest.fixture()
 def input_news_item(request):

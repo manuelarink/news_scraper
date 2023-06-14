@@ -53,7 +53,7 @@ def get_dataframe_from_csv_dir(dir_path: Path) -> pd.DataFrame:
     return df_concatenated
 
 
-def store_to_db(conn: sqlalchemy.engine.base.Connection, dataframe: pd.DataFrame) -> None:
+def replace_news_table(conn: sqlalchemy.engine.base.Connection, dataframe: pd.DataFrame) -> None:
     '''
     Stores data from dataframe to db by replacing the target table 'headlines'.
     :param conn:
@@ -127,10 +127,24 @@ def _replace_table(engine: sqlalchemy.engine.Engine) -> None:
     headlines.create(engine)
 
 
-if __name__ == '__main__':
-    database_url = {'database_url':
-                    "postgresql+psycopg2://news:news@localhost:5432/news"}
+def export_csv_to_db(database_url: dict, path: Path) -> None:
+    '''
+    Exports the data from all .csv-files in data-dir to postgresql-database.
+    Replaces the current table headlines by a newly created one.
+    :param database_url:
+    :param path:
+    :return:
+    '''
     conn = connect(**database_url)
-    path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/../data/')
     df = get_dataframe_from_csv_dir(path)
-    store_to_db(conn, df)
+    replace_news_table(conn, df)
+
+
+def import_data_to_df(database_url: dict) -> pd.DataFrame:
+    '''
+    Reads data from postgresql-database into dataframe.
+    :param database_url:
+    :return:
+    '''
+    pass
+
