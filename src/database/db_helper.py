@@ -83,7 +83,8 @@ def _replace_table(engine: sqlalchemy.engine.Engine) -> None:
     table_name = 'headlines'
 
     # drop table headlines and index sequence first
-    sql = 'DROP TABLE IF EXISTS headlines; DROP SEQUENCE IF EXISTS headlines_seq'
+    #sql = 'DROP TABLE IF EXISTS headlines; DROP SEQUENCE IF EXISTS headlines_seq'
+    sql = 'DROP TABLE IF EXISTS headlines;'
     engine.execute(sql)
 
     # create new table headlines
@@ -125,6 +126,7 @@ def _replace_table(engine: sqlalchemy.engine.Engine) -> None:
         )
     )
     headlines.create(engine)
+    # TODO: disconnect... change function parameter to connection instead of engine
 
 
 def export_csv_to_db(database_url: dict, path: Path) -> None:
@@ -138,6 +140,7 @@ def export_csv_to_db(database_url: dict, path: Path) -> None:
     conn = connect(**database_url)
     df = get_dataframe_from_csv_dir(path)
     replace_news_table(conn, df)
+    disconnect(conn)
 
 
 def import_data_to_df(database_url: dict) -> pd.DataFrame:
@@ -146,5 +149,10 @@ def import_data_to_df(database_url: dict) -> pd.DataFrame:
     :param database_url:
     :return:
     '''
-    pass
+    conn = connect(**database_url)
+    sql = 'SELECT * FROM headlines;'
+    df = pd.read_sql(sql, conn)
+    print(df)
+    disconnect(conn)
+    return df
 

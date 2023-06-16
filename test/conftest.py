@@ -1,8 +1,9 @@
 import pytest
+import os
+import src.database.export_to_db as export
 from src.rssreader import NewsItem
 from dateutil.parser import parse
 from pathlib import Path
-import os
 from src.database import db_helper
 
 
@@ -37,7 +38,7 @@ def setup_db_disconnected(request):
 @pytest.fixture()
 def setup_test_postgres_db_connected():
     '''
-    Fixture for establishing a connection to a test postgres-db.
+    Fixture for setting up a test postgres-db.
     :return:
     '''
     # connect
