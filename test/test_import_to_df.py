@@ -13,7 +13,7 @@ def test_import(monkeypatch):
     '''
     # patch database connection for using test-sqlite-database
     # TODO: maybe import_data() cannot find the database -> change path
-    monkeypatch.setitem(importdf.DEFAULT_DATABASE_URL, 'database_url', 'sqlite:///headlines_test.db')
+    monkeypatch.setitem(importdf.DEFAULT_DATABASE_URL, 'database_url', 'sqlite:///headlinestest.db')
 
     # do the import
     df = importdf.import_data()

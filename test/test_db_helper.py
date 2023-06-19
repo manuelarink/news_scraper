@@ -121,12 +121,3 @@ def test_should_create_table_headlines(setup_test_postgres_db_connected):
     assert sqlalchemy.inspect(setup_test_postgres_db_connected.engine).has_table('headlines')
 
 
-@pytest.mark.skip(reason='not yet implemented')
-@pytest.mark.db_helper
-def test_import_data_to_df():
-    '''
-    TODO
-    :return:
-    '''
-    assert True
-

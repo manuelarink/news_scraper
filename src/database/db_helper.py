@@ -4,6 +4,9 @@ from sqlalchemy import create_engine
 from pathlib import Path
 import os
 import pandas as pd
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
 def connect(**kwargs) -> sqlalchemy.engine.base.Connection:
@@ -40,20 +43,29 @@ def get_dataframe_from_csv_dir(dir_path: Path) -> pd.DataFrame:
     as primary key.
     '''
 
+    LOGGER.info('enter')
+
     df_concatenated = pd.DataFrame()
+
+    # iterate over .csv files in data directory, load these to individual dataframe and concatenate to result dataframe
+    LOGGER.info(f'check for .csv - files in {dir_path}')
     for csv_file in list(dir_path.rglob('*.csv')):
+
+        LOGGER.info(f'load {csv_file} to dataframe')
         data = load_data(csv_file)
-        if data is not None:
+
+        if data is not None and not data.empty:
+            LOGGER.info(f'read {len(data.index)} rows')
             # concatenate the dataframe to the result-dataframe
             df_concatenated = data if df_concatenated.empty else df_concatenated.append(data, ignore_index=True)
+        else:
+            LOGGER.warning(f'{csv_file} contains no data')
 
-    # add a new column for the serial number
-    #df_concatenated['Id'] = range(1, len(df_concatenated) + 1)
-    print(df_concatenated)
+    LOGGER.info(f'created dataframe with {len(df_concatenated.index)} rows')
     return df_concatenated
 
 
-def replace_news_table(conn: sqlalchemy.engine.base.Connection, dataframe: pd.DataFrame) -> None:
+def replace_and_store(conn: sqlalchemy.engine.base.Connection, dataframe: pd.DataFrame) -> None:
     '''
     Stores data from dataframe to db by replacing the target table 'headlines'.
     :param conn:
@@ -62,7 +74,7 @@ def replace_news_table(conn: sqlalchemy.engine.base.Connection, dataframe: pd.Da
     '''
     # replace table headlines
     _replace_table(conn.engine)
-    #write data to db
+    # write data to db
     dataframe.to_sql('headlines', con=conn, if_exists='append', index=False)
 
 
@@ -93,7 +105,7 @@ def _replace_table(engine: sqlalchemy.engine.Engine) -> None:
         'headlines',
         metadata,
         sqlalchemy.Column(
-            'id', sqlalchemy.BigInteger,
+            'id', sqlalchemy.Integer,
             sqlalchemy.Identity(start=1, cycle=False),
             primary_key=True, unique=True
         ),
@@ -137,10 +149,27 @@ def export_csv_to_db(database_url: dict, path: Path) -> None:
     :param path:
     :return:
     '''
+    LOGGER.info('enter')
+
+    # establish connection to db
     conn = connect(**database_url)
+    LOGGER.info(f'connection to {database_url} established') if not conn.closed \
+        else LOGGER.error(f'connection to {database_url} could not be established')
+
+    # get concatenated dataframe from all .csv in data-dir
     df = get_dataframe_from_csv_dir(path)
-    replace_news_table(conn, df)
+    LOGGER.info(f'dataframe with {(len(df.index))} rows to be exported') if not df.empty \
+        else LOGGER.warning('empty dataframe')
+
+    # exports the dataframe to db by replacing the old headlines table
+    replace_and_store(conn, df)
+
+    # disconnects from db
     disconnect(conn)
+
+    LOGGER.info(f'connection to {database_url} closed') if conn.closed \
+        else LOGGER.error(f'connection to {database_url} could not be closed')
+    LOGGER.info('exit')
 
 
 def import_data_to_df(database_url: dict) -> pd.DataFrame:
@@ -149,6 +178,7 @@ def import_data_to_df(database_url: dict) -> pd.DataFrame:
     :param database_url:
     :return:
     '''
+    print(os.getcwd())
     conn = connect(**database_url)
     sql = 'SELECT * FROM headlines;'
     df = pd.read_sql(sql, conn)

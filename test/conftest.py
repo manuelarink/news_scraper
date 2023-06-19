@@ -7,7 +7,7 @@ from pathlib import Path
 from src.database import db_helper
 
 
-@pytest.fixture(params=[{'database_url': 'sqlite:///headlines_test.db'},
+@pytest.fixture(params=[{'database_url': 'sqlite:///headlinestest.db'},
                         {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news'}],
                 ids=['test', 'production'])
 def setup_db_connected(request):
@@ -21,7 +21,7 @@ def setup_db_connected(request):
     db_helper.disconnect(con)
 
 
-@pytest.fixture(params=[{'database_url': 'sqlite:///headlines_test.db'},
+@pytest.fixture(params=[{'database_url': 'sqlite:///headlinestest.db'},
                         {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news'}],
                 ids=['test', 'production'])
 def setup_db_disconnected(request):
@@ -58,11 +58,11 @@ def input_csv_dir_path():
     Fixture that return path-object to directory of test-csv.files.
     :return:
     '''
-    return Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/sample_data/')
+    return Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/config/')
 
 
-@pytest.fixture(params=['test/sample_data/news-2023-06-06_12-40-37.csv',
-                        'test/sample_data/news-2023-06-07_12-03-19.csv'],
+@pytest.fixture(params=['test/config/news-2023-06-06_12-40-37.csv',
+                        'test/config/news-2023-06-07_12-03-19.csv'],
                 ids=['news-2023-06-06_12-40-37.csv',
                      'news-2023-06-07_12-03-19.csv'])
 def input_data(request):
@@ -74,7 +74,7 @@ def input_data(request):
     return db_helper.load_data(csv_file_path), csv_file_path
 
 
-@pytest.fixture(params=['test/sample_data/news-2022-08-04_12-16-50.csv'],
+@pytest.fixture(params=['test/config/news-2022-08-04_12-16-50.csv'],
                 ids=['no-content: news-2022-08-04_12-16-50.csv'])
 def input_no_content(request):
     '''
