@@ -7,6 +7,17 @@ from src.rssreader import RSSNewsReader
 
 class NewsScraper:
 
+    SOURCES = [
+        {"source": "Focus", "url": "https://rss.focus.de/politik/"},
+        {"source": "Focus", "url": "https://rss.focus.de/politik/ausland/"},
+        {"source": "stern", "url": "https://www.stern.de/feed/standard/politik"},
+        {"source": "Tagesschau", "url": "https://www.tagesschau.de/xml/rss2/"},
+        {"source": "Welt", "url": "https://www.welt.de/feeds/topnews.rss"},
+        {"source": "Zeit", "url": "https://newsfeed.zeit.de/index"},
+        {"source": "taz", "url": "https://taz.de/!p4608;rss/"},
+        {"source": "ZDF heute", "url": "https://www.zdf.de/rss/zdf/nachrichten"}
+    ]
+
     def __init__(self, feed_urls):
         self.feed_urls = feed_urls
 
@@ -47,17 +58,5 @@ class NewsScraper:
             ctrl_csvwriter.writerow([now])
 
 if __name__ == '__main__':
-
-    sources = [
-    {"source": "Focus", "url": "https://rss.focus.de/politik/"},
-    {"source": "Focus", "url": "https://rss.focus.de/politik/ausland/"},
-    {"source": "stern", "url": "https://www.stern.de/feed/standard/politik"},
-    {"source": "Tagesschau", "url": "https://www.tagesschau.de/xml/rss2/"},
-    {"source": "Welt", "url": "https://www.welt.de/feeds/topnews.rss"},
-    {"source": "Zeit", "url": "https://newsfeed.zeit.de/index"},
-    {"source": "taz", "url": "https://taz.de/!p4608;rss/"},
-    {"source": "ZDF heute", "url": "https://www.zdf.de/rss/zdf/nachrichten"}
-]
-
-    scraper = NewsScraper(sources)
+    scraper = NewsScraper(SOURCES)
     scraper.scrape()
