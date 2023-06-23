@@ -1,6 +1,5 @@
 import pytest
 import os
-import src.database.export_to_db as export
 from src.rssreader import NewsItem
 from dateutil.parser import parse
 from pathlib import Path

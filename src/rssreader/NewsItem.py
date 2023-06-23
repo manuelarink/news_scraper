@@ -30,10 +30,17 @@ class NewsItem:
                and self.copyright == other.copyright \
                and self.source == other.source
 
+    def __repr__(self):
+        return (f'Date={self.date!r}, Description={self.description!r}, '
+                f'URL={self.url!r}, Author={self.author!r}, '
+                f'Title={self.title!r}, Text={self.text!r}, '
+                f'Category={self.category!r}, Copyright={self.copyright!r}, '
+                f'Source={self.source!r}')
+
     def __str__(self):
-        return f'Date={self.date}\n Description={self.description}\n ' \
-               f'URL={self.url}\n Author={self.author}\n ' \
-               f'Title={self.title}\n Text={self.text}\n' \
-               f'Category={self.category}\n Copyright={self.copyright}\n' \
-               f'Source={self.source}'
+        return (f'Date={self.date}, Description={self.description}, '
+                f'URL={self.url}, Author={self.author}, '
+                f'Title={self.title}, Text={self.text}, '
+                f'Category={self.category}, Copyright={self.copyright}, '
+                f'Source={self.source}')
 

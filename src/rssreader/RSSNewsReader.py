@@ -1,12 +1,29 @@
+import datetime
+import logging
+import bs4.element
 import requests
 from dateutil.parser import parse
 from bs4 import BeautifulSoup
 from src.rssreader import NewsItem
 
+LOGGER = logging.getLogger(__name__)
+
 
 class RSSNewsReader:
+    '''
+    Class for fetching headlines from rss-News-Feeds and converting them into instances
+    of src.rssreader.NewsItem.
+    '''
 
-    def fetch(self, feed_urls, start_time = None):
+    def fetch(self, feed_urls: list, start_time: datetime.datetime = None) -> NewsItem:
+        '''
+        Iterates over the list of URLs and requests the contents of the RSS-Feeds,
+        parses them and creates instances of class src.rssreader.NewsItem.
+        If a start_time is provided only headlines up from this date will be processed.
+        :param feed_urls:
+        :param start_time:
+        :return:
+        '''
 
         for feed_url in feed_urls:
 
@@ -17,7 +34,7 @@ class RSSNewsReader:
             items = doc.find_all('item')
             for item in items:
 
-                # get itemn date
+                # get item date
                 item_date = self.get_item_date(item)
 
                 # create and yield NewsItem
@@ -26,7 +43,7 @@ class RSSNewsReader:
                     yield news_item
 
     @staticmethod
-    def item_already_retrieved(start_time, item_date):
+    def item_already_retrieved(start_time: datetime.datetime, item_date: datetime.datetime) -> bool:
         '''
         Checks if article is older than the ones we want to retrieve.
         :param self:
@@ -41,7 +58,7 @@ class RSSNewsReader:
             return False
 
     @staticmethod
-    def get_item_date(item):
+    def get_item_date(item: bs4.element.Tag) -> datetime.datetime:
         '''
         Extract the date of the item.
         :param item:
@@ -52,7 +69,7 @@ class RSSNewsReader:
         return article_date
 
     @staticmethod
-    def create_news_item(article_date, feed_url, item):
+    def create_news_item(article_date: datetime.datetime, feed_url: dict, item: bs4.element.Tag) -> NewsItem:
         '''
         Creates NewsItem from XML-<item>.
         :param article_date:
@@ -84,7 +101,8 @@ class RSSNewsReader:
             news_item.copyright = item.select_one("copyright").text
         return news_item
 
-    def create_soup(self, res):
+    @staticmethod
+    def create_soup(res: requests.Response):
         '''
         Parses the content of rss-feed and creates soup.
         :param res:
@@ -93,12 +111,20 @@ class RSSNewsReader:
         doc = BeautifulSoup(res.content, 'lxml')
         return doc
 
-    def request_feed(self, feed_url):
+    @staticmethod
+    def request_feed(feed_url: dict) -> requests.Response:
         '''
         HTTP-Request for retrieving rss-feed from given url.
+        If request is not successful returns None
         :param feed_url:
         :return:
         '''
-        print("Lese " + feed_url["url"] + ":")
-        res = requests.get(feed_url["url"])
-        return res
+        LOGGER.info('enter')
+        LOGGER.info(f'request feed at {feed_url["url"]}')
+        res = None
+        try:
+            res = requests.get(feed_url["url"])
+        except ConnectionError as e:
+            LOGGER.error(e)
+        finally:
+            return res

@@ -5,9 +5,37 @@ from src.rssreader import RSSNewsReader
 from src.news_scraper import NewsScraper
 
 
-# TODO... hier weiter testen
-# TODO: Tests mit verschiedenen Parametern von fetch
-# TODO: Test bei fehlerhafter URL
+# TODO TEST for method request_feed
+# feed_url not valid anymore - x
+# feed_url provided, valid and can be retieved
+@pytest.mark.rss_news_reader
+def test_request_feed_url_not_valid():
+    '''
+    If url to request is wrong or not valid anymore uut (unit under test) should return None
+    instead of raising Exception
+    :return:
+    '''
+    assert RSSNewsReader.request_feed({"url": 'http://not-a-valid-resource.de/news.rss'}) is None
+
+
+@pytest.mark.rss_news_reader
+def test_request_feed_url_valid():
+    '''
+    Tests if response is correct when requesting a valid url.
+    Type must be Response, StatusCode 200, content rss, url must correspond to call parameter
+    (TODO We need to patch here (vcr))
+    :return:
+    '''
+    url = 'https://rss.focus.de/politik/'
+    response = RSSNewsReader.request_feed({'url': url})
+    assert type(response) is requests.Response
+    assert response.status_code == 200
+    assert response.url == url
+    assert response.text.startswith('<rss version="2.0"')
+
+
+# TODO Test von fetch()
+# TODO: Tests mit verschiedenen Parametern von fetch, Test bei fehlerhafter URL
 # TODO: Test bei nicht konformem Inhalt des RSS-Files (anderer Struktur)
 # TODO: Test bei ungültigem Startdatum
 # TODO weitere Szenarien...

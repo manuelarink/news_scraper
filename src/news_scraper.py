@@ -58,5 +58,5 @@ class NewsScraper:
             ctrl_csvwriter.writerow([now])
 
 if __name__ == '__main__':
-    scraper = NewsScraper(SOURCES)
+    scraper = NewsScraper(NewsScraper.SOURCES)
     scraper.scrape()

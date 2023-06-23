@@ -1,6 +1,8 @@
 import pytest
-import sqlalchemy
 import pandas as pd
+from sqlalchemy import inspect
+from sqlalchemy.engine.base import Connection
+from sqlalchemy.exc import SQLAlchemyError
 from src.database import db_helper
 
 
@@ -11,7 +13,7 @@ def test_connect_to_db_successful(setup_db_connected):
     :param setup_db:
     :return:
     '''
-    assert type(setup_db_connected) == sqlalchemy.engine.base.Connection
+    assert type(setup_db_connected) == Connection
 
 
 @pytest.mark.db_helper
@@ -106,7 +108,7 @@ def test_connect_to_db_fails(database_url):
     :param database_url:
     :return:
     '''
-    with pytest.raises(sqlalchemy.exc.SQLAlchemyError):
+    with pytest.raises(SQLAlchemyError):
         con = db_helper.connect(**{'database_url': database_url})
 
 
@@ -118,6 +120,6 @@ def test_should_create_table_headlines(setup_test_postgres_db_connected):
     :return:
     '''
     db_helper._replace_table(setup_test_postgres_db_connected.engine)
-    assert sqlalchemy.inspect(setup_test_postgres_db_connected.engine).has_table('headlines')
+    assert inspect(setup_test_postgres_db_connected.engine).has_table('headlines')
 
 
