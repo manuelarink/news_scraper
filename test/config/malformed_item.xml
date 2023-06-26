@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>tagesschau.de - Die Nachrichten der ARD</title>
+    <link>https://www.tagesschau.de/infoservices/alle-meldungen-100.html</link>
+    <description>Die aktuellen Beiträge der Seite https://www.tagesschau.de/infoservices/alle-meldungen-100.html</description>
+    <language>de</language>
+    <copyright>ARD-aktuell / tagesschau.de</copyright>
+    <lastBuildDate>Fri, 02 Jun 2023 12:21:07 +0200</lastBuildDate>
+    <pubDate>Fri, 02 Jun 2023 12:21:07 +0200</pubDate>
+    <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+    <ttl>90</ttl>
+    <dc:publisher>tagesschau.de</dc:publisher>
+    <dc:language>de</dc:language>
+    <dc:rights>ARD-aktuell / tagesschau.de</dc:rights>
+    <dc:date>2023-04-14T07:19:20Z</dc:date>
+    <dc:source>tagesschau.de</dc:source>
+    <item>
+      <link>https://www.tagesschau.de/newsticker/liveblog-ukraine-freitag-268.html</link>
+      <description>China hat dazu aufgerufen, keine weiteren Waffen mehr für den Konflikt zu liefern, um den Krieg beenden zu können. Laut des Gouverneurs der russischen Grenzregion Belgorod sind bei einem Angriff zwei Menschen getötet worden. Die Entwicklungen im Liveblog.</description>
+      <pubDate>Fri, 02 Jun 2023 12:18:20 +0200</pubDate>
+      <guid>505fb00a-7f88-4f2c-b552-abdea994f19f</guid>
+      <dc:date>2023-06-02T10:18:20Z</dc:date>
+      <content:encoded><![CDATA[<p> <a href="https://www.tagesschau.de/newsticker/liveblog-ukraine-freitag-268.html"><img src="https://images.tagesschau.de/image/6b564b7f-1885-4196-932b-0b2b0eb15fd7/AAABiHudg-M/AAABg8tME_8/16x9-1280/li-hui-104.jpg" alt="Li Hui | AFP" /></a> <br/> <br/>China hat dazu aufgerufen, keine weiteren Waffen mehr für den Konflikt zu liefern, um den Krieg beenden zu können. Laut des Gouverneurs der russischen Grenzregion Belgorod sind bei einem Angriff zwei Menschen getötet worden. Die Entwicklungen im Liveblog.[<a href="https://www.tagesschau.de/newsticker/liveblog-ukraine-freitag-268.html">mehr</a>]</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

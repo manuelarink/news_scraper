@@ -77,6 +77,13 @@ class RSSNewsReader:
         :param item:
         :return:
         '''
+
+        LOGGER.info('enter')
+
+        if item is None:
+            LOGGER.error('item must not be None')
+            raise TypeError('item must mot be None')
+
         news_item = NewsItem()
         news_item.title = item.select_one("title").text \
             .replace('<![CDATA[', '') \
@@ -102,10 +109,11 @@ class RSSNewsReader:
         return news_item
 
     @staticmethod
-    def create_soup(res: requests.Response):
+    def create_soup(res: requests.Response) -> BeautifulSoup:
         '''
         Parses the content of rss-feed and creates soup.
-        :param res:
+        :param res: Response to HTTP-Request with rss-content,
+        must not be None
         :return:
         '''
         doc = BeautifulSoup(res.content, 'lxml')
@@ -116,7 +124,8 @@ class RSSNewsReader:
         '''
         HTTP-Request for retrieving rss-feed from given url.
         If request is not successful returns None
-        :param feed_url:
+        :param feed_url: dictionary that provides the url to request by key 'url',
+        must not be None
         :return:
         '''
         LOGGER.info('enter')

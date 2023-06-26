@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>tagesschau.de - Die Nachrichten der ARD</title>
+    <link>https://www.tagesschau.de/infoservices/alle-meldungen-100.html</link>
+    <description>Die aktuellen Beiträge der Seite https://www.tagesschau.de/infoservices/alle-meldungen-100.html</description>
+    <language>de</language>
+    <copyright>ARD-aktuell / tagesschau.de</copyright>
+    <lastBuildDate>Fri, 02 Jun 2023 12:21:07 +0200</lastBuildDate>
+    <pubDate>Fri, 02 Jun 2023 12:21:07 +0200</pubDate>
+    <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+    <ttl>90</ttl>
+    <dc:publisher>tagesschau.de</dc:publisher>
+    <dc:language>de</dc:language>
+    <dc:rights>ARD-aktuell / tagesschau.de</dc:rights>
+    <dc:date>2023-04-14T07:19:20Z</dc:date>
+    <dc:source>tagesschau.de</dc:source>
+    <item>
+      <title>Welche Firmen besonders vom KI-Boom profitieren</title>
+      <link>https://www.tagesschau.de/wirtschaft/technologie/ki-boom-100.html</link>
+      <description>Tech-Unternehmen konnten in den vergangenen Wochen vom Boom in der KI-Branche profitieren. Allerdings gibt es Unterschiede - und ein Unternehmen sticht besonders hervor.</description>
+      <pubDate>Thu, 01 Jun 2023 19:00:53 +0200</pubDate>
+      <guid>93d4589c-be81-4303-9b42-cb1cfda6a3aa</guid>
+      <dc:date>2023-06-01T17:00:53Z</dc:date>
+      <content:encoded><![CDATA[<p> <a href="https://www.tagesschau.de/wirtschaft/technologie/ki-boom-100.html"><img src="https://images.tagesschau.de/image/a0ac98e2-711d-481f-8142-928a2de5658b/AAABhnlfsaY/AAABg8tME_8/16x9-1280/nvidia-103.jpg" alt="Schriftzug des US-Konzerns Nvidia | REUTERS" /></a> <br/> <br/>Tech-Unternehmen konnten in den vergangenen Wochen vom Boom in der KI-Branche profitieren. Allerdings gibt es Unterschiede - und ein Unternehmen sticht besonders hervor. Von: .[<a href="https://www.tagesschau.de/wirtschaft/technologie/ki-boom-100.html">mehr</a>]</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>
