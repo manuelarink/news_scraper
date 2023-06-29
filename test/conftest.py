@@ -1,5 +1,8 @@
 import pytest
 import os
+
+from bs4 import BeautifulSoup
+
 from src.rssreader import NewsItem
 from dateutil.parser import parse
 from pathlib import Path
@@ -84,6 +87,7 @@ def input_no_content(request):
     csv_file_path = Path(f'{os.path.dirname(os.path.dirname(__file__))}/{request.param}')
     return db_helper.load_data(csv_file_path), csv_file_path
 
+
 @pytest.fixture()
 def input_news_item(request):
     """
@@ -105,3 +109,17 @@ def input_news_item(request):
                     '',
                     '',
                     'Focus')
+
+
+@pytest.fixture(params=['<item><pubDate>Fri, 02 Jun 2023 12:18:20 +0200</pubDate></item>',
+                        '<item><pubDate>Fri, 02 Jun 2023 12:18:20 GMT</pubDate></item>',
+                        '<item><pubDate>Fri, 2 Jun 2023 12:18:20 +0200</pubDate></item>',
+                        '<item><pubDate>Fri, 2 Jun 23 12:18:20 +0200</pubDate></item>'])
+def input_item_pubdate_varying(request):
+    """
+    Fixture for providing a BeautifulSoup
+    :param request:
+    :return:
+    """
+    soup = BeautifulSoup(request.param, 'lxml')
+    return soup.item

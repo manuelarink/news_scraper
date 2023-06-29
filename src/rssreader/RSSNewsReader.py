@@ -64,6 +64,12 @@ class RSSNewsReader:
         :param item:
         :return:
         '''
+        LOGGER.info('enter')
+
+        if item is None:
+            LOGGER.error('item must not be None')
+            raise TypeError('item must mot be None')
+
         article_date_str = item.select_one("pubdate").text.strip()
         article_date = parse(article_date_str)
         return article_date

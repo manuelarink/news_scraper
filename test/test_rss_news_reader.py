@@ -4,6 +4,7 @@ import pytest
 from bs4 import BeautifulSoup
 from src.rssreader import RSSNewsReader, NewsItem
 from src.news_scraper import NewsScraper
+from test.utils.util import get_pubdates
 
 
 # Test cases for method test_request_feed_url:
@@ -41,7 +42,7 @@ def test_request_feed_url_valid():
 # Test cases for method create_news_item(article_date: datetime.datetime, feed_url: dict, item: bs4.element.Tag) -> NewsItem
 # - item is None: should raise exception - x
 # - item contains malformed data (expected child-tags and attributes missed): should raise exception - x (skipped because not useful)
-# - item is valid: should return NewsItem with attributes corresponding to item-content
+# - item is valid: should return NewsItem with attributes corresponding to item-content - x
 @pytest.mark.rss_news_reader
 def test_create_news_item_item_none():
     """
@@ -69,6 +70,43 @@ def test_create_news_item_item_malformed():
         RSSNewsReader.create_news_item(datetime.datetime.now(),
                                        {'url': 'https://rss.focus.de/politik/', 'source': 'Focus'},
                                        get_malformed_item_stub())
+
+
+# Test cases for method get_item_date(item: bs4.element.Tag) -> datetime.datetime
+# - item is None - should raise exception - x
+# - item is malformed (contains no 'pubdate') - should raise exception - not implemented, not useful
+# - item is valid:
+#   test pubdate with different date format - should parse correctly and
+#   return correct datetime corresponding to 'pubdate' in item - x
+@pytest.mark.rss_news_reader
+def test_get_item_date_item_none():
+    """
+    If no item is provided, uut should raise TypeError
+    :return:
+    """
+    with pytest.raises(TypeError):
+        RSSNewsReader.get_item_date(None)
+
+
+@pytest.mark.rss_news_reader
+@pytest.mark.parametrize('item, expect_day, expect_month, expect_year, expect_hour, expect_minute, expect_second',
+                         get_pubdates())
+def test_get_item_date_on_dateformat(item, expect_day, expect_month, expect_year,
+                                     expect_hour, expect_minute, expect_second):
+    """
+    Test on valid item with different dateformats. Should parse without errors
+    and return correct datetime.
+    :return:
+    """
+    soup = BeautifulSoup(item, 'lxml')
+    article_date = RSSNewsReader.get_item_date(soup.item)
+    assert type(article_date) == datetime.datetime
+    assert article_date.year == int(expect_year)
+    assert article_date.month == int(expect_month)
+    assert article_date.day == int(expect_day)
+    assert article_date.hour == int(expect_hour)
+    assert article_date.minute == int(expect_minute)
+    assert article_date.second == int(expect_second)
 
 
 @pytest.mark.rss_news_reader
