@@ -12,7 +12,6 @@ def test_import(monkeypatch):
     :return:
     '''
     # patch database connection for using test-sqlite-database
-    # TODO: maybe import_data() cannot find the database -> change path
     monkeypatch.setitem(importdf.DEFAULT_DATABASE_URL, 'database_url', 'sqlite:///headlinestest.db')
 
     # do the import
