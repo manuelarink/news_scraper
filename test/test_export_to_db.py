@@ -19,7 +19,8 @@ def test_export(monkeypatch):
     # patch database connection and path for using test-sqlite-database and sample-data-directory
     LOGGER.info('patch exportDEFAULT_DATABASE_URL and export.DEFAULT_DATA_DIR')
     monkeypatch.setitem(export.DEFAULT_DATABASE_URL, 'database_url', 'sqlite:///headlinestest.db')
-    monkeypatch.setitem(export.DEFAULT_DATA_DIR, 'data_dir', Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/config/'))
+    monkeypatch.setitem(export.DEFAULT_DATA_DIR, 'data_dir',
+                        Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/config/test_data_dir'))
 
     # do the export
     LOGGER.info('call export')

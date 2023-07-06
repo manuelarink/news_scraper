@@ -60,11 +60,11 @@ def input_csv_dir_path():
     Fixture that return path-object to directory of test-csv.files.
     :return:
     '''
-    return Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/config/')
+    return Path(f'{os.path.dirname(os.path.dirname(__file__))}/test/config/test_data_dir')
 
 
-@pytest.fixture(params=['test/config/news-2023-06-06_12-40-37.csv',
-                        'test/config/news-2023-06-07_12-03-19.csv'],
+@pytest.fixture(params=['test/config/test_data_dir/news-2023-06-06_12-40-37.csv',
+                        'test/config/test_data_dir/news-2023-06-07_12-03-19.csv'],
                 ids=['news-2023-06-06_12-40-37.csv',
                      'news-2023-06-07_12-03-19.csv'])
 def input_data(request):
@@ -76,7 +76,7 @@ def input_data(request):
     return db_helper.load_data(csv_file_path), csv_file_path
 
 
-@pytest.fixture(params=['test/config/news-2022-08-04_12-16-50.csv'],
+@pytest.fixture(params=['test/config/test_data_dir/news-2022-08-04_12-16-50.csv'],
                 ids=['no-content: news-2022-08-04_12-16-50.csv'])
 def input_no_content(request):
     '''

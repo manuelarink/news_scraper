@@ -1,4 +1,3 @@
-''' Reads all the .csv-Files in data-dir and stores their contents to postgres-database.'''
 import sqlalchemy
 from sqlalchemy import create_engine
 from pathlib import Path
@@ -185,4 +184,42 @@ def import_data_to_df(database_url: dict) -> pd.DataFrame:
     print(df)
     disconnect(conn)
     return df
+
+
+def insert_csv_to_db(database_url: dict, csv_file_path: Path) -> None:
+    '''
+    Inserts the rows of a csv-file in the headlines table in the database.
+    :param database_url: dictionary containing the database connection parameters
+    :type database_url: dict
+    :param csv_file_path: path to the csv-file to be inserted in the database
+    :type csv_file_path: Path
+    :return: None
+    '''
+    LOGGER.info('enter')
+
+    # establish connection to db
+    conn = connect(**database_url)
+    LOGGER.info(f'connection to {database_url} established') if not conn.closed \
+        else LOGGER.error(f'connection to {database_url} could not be established')
+
+    # load csv-file into dataframe
+    df = load_data(csv_file_path)
+    LOGGER.info(f'dataframe with {(len(df.index))} rows to be inserted') if not df.empty \
+        else LOGGER.warning('empty dataframe')
+
+    if not df.empty:
+        # insert dataframe into db
+        df.to_sql('headlines', con=conn, if_exists='append', index=False)
+        LOGGER.info(f'dataframe with {(len(df.index))} rows inserted')
+    else:
+        LOGGER.warning('empty dataframe - nothing to insert')
+
+    # disconnects from db
+    disconnect(conn)
+    LOGGER.info(f'connection to {database_url} closed') if conn.closed \
+        else LOGGER.error(f'connection to {database_url} could not be closed')
+    LOGGER.info('exit')
+
+
+
 

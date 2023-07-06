@@ -123,3 +123,10 @@ def test_should_create_table_headlines(setup_test_postgres_db_connected):
     assert inspect(setup_test_postgres_db_connected.engine).has_table('headlines')
 
 
+@pytest.mark.db_helper
+# TODO implement test
+def test_insert_csv_to_db_successful(setup_test_postgres_db_connected, input_csv_dir_path):
+    assert False
+
+
+
