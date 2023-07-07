@@ -14,20 +14,22 @@ def connect(**kwargs) -> sqlalchemy.engine.base.Connection:
     :param kwargs:
     :return:
     '''
+    LOGGER.info('enter')
+    LOGGER.info(f'kwargs={kwargs}')
     engine = create_engine(kwargs['database_url'])
     return engine.connect()
 
 
 def load_data(csv_file: Path) -> pd.DataFrame:
     '''
-    Reads csv-File into Dataframe.
-    :param csv_file:
-    :return:
+    Reads csv-File into Dataframe. If file is empty, an empty dataframe is returned.
+    :param csv_file: Path to csv-file
+    :return: Dataframe
     '''
     if csv_file.stat().st_size == 0:
         # ignore empty files
         print(f'{csv_file} empty - skipping')
-        return None
+        return pd.DataFrame()
     else:
         # read csv into pandas-dataframe
         df = pd.read_csv(csv_file, delimiter=';', quotechar='"', header=None)

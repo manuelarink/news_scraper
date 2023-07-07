@@ -8,10 +8,12 @@ from dateutil.parser import parse
 from pathlib import Path
 from src.database import db_helper
 
+PG_TEST_DB_URL = {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news_test'}
+SQLITE_TEST_DB_URL = {'database_url': 'sqlite:///headlinestest.db'}
 
-@pytest.fixture(params=[{'database_url': 'sqlite:///headlinestest.db'},
-                        {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news'}],
-                ids=['test', 'production'])
+
+@pytest.fixture(params=[PG_TEST_DB_URL, SQLITE_TEST_DB_URL],
+                ids=['test-postgres', 'test-sqlite'])
 def setup_db_connected(request):
     '''
     Parametrized fixture for establishing a connection to a db.
@@ -23,9 +25,8 @@ def setup_db_connected(request):
     db_helper.disconnect(con)
 
 
-@pytest.fixture(params=[{'database_url': 'sqlite:///headlinestest.db'},
-                        {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news'}],
-                ids=['test', 'production'])
+@pytest.fixture(params=[PG_TEST_DB_URL, SQLITE_TEST_DB_URL],
+                ids=['test-postgres', 'test-sqlite'])
 def setup_db_disconnected(request):
     '''
     Parametrized fixture for disconnection from db.
@@ -40,16 +41,17 @@ def setup_db_disconnected(request):
 @pytest.fixture()
 def setup_test_postgres_db_connected():
     '''
-    Fixture for setting up a test postgres-db.
-    :return:
+    Fixture for establishing a connection to a postgres-db for testing.
+    Connects to database, clear table data and yield connection-object and url to postgres-db.
+    Closes the connection after test.
+    :return: connection-object, url to postgres-db
+    :rtype: tuple
     '''
     # connect
-    test_db_url = {'database_url': 'postgresql+psycopg2://news:news@localhost:5432/news_test'}
-    con = db_helper.connect(**test_db_url)
+    con = db_helper.connect(**PG_TEST_DB_URL)
     # drop table headlines if exists
-    sql = 'DROP TABLE IF EXISTS headlines; DROP SEQUENCE IF EXISTS headlines_seq'
-    con.engine.execute(sql)
-    yield con
+    db_helper._replace_table(con.engine)
+    yield con, PG_TEST_DB_URL
     # disconnect
     db_helper.disconnect(con)
 

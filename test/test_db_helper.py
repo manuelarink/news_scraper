@@ -1,9 +1,11 @@
 import pytest
 import pandas as pd
+import sqlalchemy.engine
 from sqlalchemy import inspect
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.exc import SQLAlchemyError
 from src.database import db_helper
+from test.utils.util import get_csv_file_path, get_csv_nmb_of_rows, get_db_nmb_rows
 
 
 @pytest.mark.db_helper
@@ -46,7 +48,7 @@ def test_load_data_empty_input_file(input_no_content):
     dataframe, csv_file_path = input_no_content
     with open(csv_file_path, 'r') as file:
         count_rows = len(file.readlines())
-    assert dataframe is None and count_rows == 0
+    assert dataframe.empty and count_rows == 0
 
 
 @pytest.mark.db_helper
@@ -119,14 +121,45 @@ def test_should_create_table_headlines(setup_test_postgres_db_connected):
     Table should be successfully created.
     :return:
     '''
-    db_helper._replace_table(setup_test_postgres_db_connected.engine)
-    assert inspect(setup_test_postgres_db_connected.engine).has_table('headlines')
+    con, db_url = setup_test_postgres_db_connected
+    db_helper._replace_table(con.engine)
+    assert inspect(con.engine).has_table('headlines')
 
 
 @pytest.mark.db_helper
 # TODO implement test
-def test_insert_csv_to_db_successful(setup_test_postgres_db_connected, input_csv_dir_path):
-    assert False
+# - test if connection to db can't be established: should raise exception
+# - test if csv-file is empty: should pass through without exception, no changes on table headlines
+# - test if connection is established and csv-file contains data: should insert data into table headlines - (x)
+def test_insert_csv_to_db_successful(setup_test_postgres_db_connected: sqlalchemy.engine.Connection):
+    '''
+    Test on successful inserting of csv-files into table headlines.
+    :param setup_test_postgres_db_connected: fixture providing connection and url to test postgres db
+    :return: None
+    '''
+    con, db_url = setup_test_postgres_db_connected
+    csv_file = get_csv_file_path(empty=False)
+    db_helper.insert_csv_to_db(db_url, csv_file)
+    csv_nmb_rows = get_csv_nmb_of_rows(csv_file)
+    db_nmb_rows = get_db_nmb_rows(con)
+    assert csv_nmb_rows == db_nmb_rows
+
+
+@pytest.mark.db_helper
+def test_insert_csv_to_db_empty_file(setup_test_postgres_db_connected: sqlalchemy.engine.Connection):
+    '''
+    Test on correct behavior in case of empty csv-file. Sould pass through without exception, no changes on
+    table headlines.
+    :param setup_test_postgres_db_connected: fixture providing connection and url to test postgres db
+    :return: None
+    '''
+    con, db_url = setup_test_postgres_db_connected
+    csv_file = get_csv_file_path(empty=True)
+    db_helper.insert_csv_to_db(db_url, csv_file)
+    csv_nmb_rows = get_csv_nmb_of_rows(csv_file)
+    db_nmb_rows = get_db_nmb_rows(con)
+    assert csv_nmb_rows == 0 and db_nmb_rows == 0
+
 
 
 
