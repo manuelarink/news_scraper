@@ -129,7 +129,7 @@ def test_should_create_table_headlines(setup_test_postgres_db_connected):
 @pytest.mark.db_helper
 # TODO implement test
 # - test if connection to db can't be established: should raise exception
-# - test if csv-file is empty: should pass through without exception, no changes on table headlines
+# - test if csv-file is empty: should pass through without exception, no changes on table headlines - (x)
 # - test if connection is established and csv-file contains data: should insert data into table headlines - (x)
 def test_insert_csv_to_db_successful(setup_test_postgres_db_connected: sqlalchemy.engine.Connection):
     '''
@@ -148,7 +148,7 @@ def test_insert_csv_to_db_successful(setup_test_postgres_db_connected: sqlalchem
 @pytest.mark.db_helper
 def test_insert_csv_to_db_empty_file(setup_test_postgres_db_connected: sqlalchemy.engine.Connection):
     '''
-    Test on correct behavior in case of empty csv-file. Sould pass through without exception, no changes on
+    Test on correct behavior in case of empty csv-file. Should pass through without exception, no changes on
     table headlines.
     :param setup_test_postgres_db_connected: fixture providing connection and url to test postgres db
     :return: None
