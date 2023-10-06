@@ -57,7 +57,7 @@ class ConcatStringFeatureEncoder(BaseEstimator, TransformerMixin):
         X = X.copy()
 
         X[self.new_col] = \
-            X[self.ref_col_list].apply(lambda row: '-'.join(row.values.astype(str)), axis=1)
+            X[self.ref_col_list].apply(lambda row: ' - '.join(row.values.astype(str)), axis=1)
 
         return X
 
