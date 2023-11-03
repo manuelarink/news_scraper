@@ -4,7 +4,7 @@ numpy
 matplotlib
 seaborn
 joblib
+spacy>3.0.0,<4.0.0
 scikit-learn
 wordcloud
 pyLDAvis
-spacy
