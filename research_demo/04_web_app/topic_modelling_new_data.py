@@ -119,9 +119,11 @@ def main():
         lda_model = joblib.load(model_path)
 
 
-        st.info("This application shows the processing pipeline for predicting topics of news data from a trained "
-                "model using Latent Dirichlet Allocation (LDA). "
-                "To use this demo: On the sidebar left, select the input features from which the model was trained. "
+        st.write("This application shows the processing pipeline for predicting topics of news data from a trained "
+                "model using Latent Dirichlet Allocation (LDA). ")
+        st.write("For more info on this project check "
+                "[project website](http://portfolio.manuelarink.de/2023/10/20/topic-modelling-of-news-with-latent-dirichlet-allocation/).")
+        st.info("To use this demo: On the sidebar left, select the input features from which the model was trained. "
                 "You can choose to use just the headline title or a combination of the headline title, "
                 "description and text. "
                 "Select the number of topics that you want to extract using LDA. "
@@ -135,6 +137,7 @@ def main():
 
     elif choice == "Evaluation / Visualization":
         st.subheader("Evaluation and Visualization of the results of LDA")
+        st.info('Work on this is still in progress - please visit later.')
 
 
 
