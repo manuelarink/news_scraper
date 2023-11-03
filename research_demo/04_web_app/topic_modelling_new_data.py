@@ -24,19 +24,80 @@ import pyLDAvis.lda_model
 
 ROOT_PATH = Path('research_demo/04_web_app')
 
-def load_data() -> pd.DataFrame:
-    """ Loads the dataset with news data for topic modeling """
-    pred = pd.read_csv(ROOT_PATH / '00_pred_raw.csv', index_col=None)
-    pred.drop(columns=['Unnamed: 0'], axis=1, inplace=True)
-    return pred
 
 def execute_preprocessing_pipe(pred) -> pd.DataFrame:
-    """ Loads the preprocessing pipeline and processes the news dataframe """
+    """ Loads the preprocessing pipeline and processes the news dataframe"""
+
     with st.status("Load preprocessing pipeline and transform data..", expanded=True) as status:
         topic_pipe = joblib.load(ROOT_PATH / 'topic_pipe_nosplit.joblib')
         pred_preprocessed =  topic_pipe.transform(pred)
-        status.update(label="Preprocessing completed!", state="complete", expanded=False)
+        status.update(label="Preprocessing completed.", state="complete", expanded=False)
         return pred_preprocessed
+
+
+def predict_topics(cv, feature, model, model_name, pred_preprocessed) -> pd.DataFrame:
+    """Predict topics with trained LDA model"""
+
+    feature_txt = 'title' if feature == 'title_cleaned' else 'title, description and text'
+    st.subheader(f'Predict {model_name} on {feature_txt}')
+
+    with st.status("Create Document-Term-Matrix...", expanded=True) as status:
+        # create DTM from given feature
+        dtm = cv.transform(pred_preprocessed[feature])
+        # show most important words of topics found
+        status.update(label="Document-Term-Matrix created.", state="complete", expanded=False)
+
+    # for index, topic in enumerate(model.components_):
+    #     st.write(f'Top 15 words for theme #{index}')
+    #     st.write([cv.get_feature_names_out()[i] for i in topic.argsort()[-15:]])
+
+        # show 15 most important words of topics
+    generate_wordclouds(15, model, cv)
+
+    with st.status("Predict topics...", expanded=True) as status:
+        # predict topics on corpus
+        topic_results = model.transform(dtm)
+        pred_preprocessed['topic'] = topic_results.argmax(axis=1)
+        status.update(label="Prediction completed.", state="complete", expanded=False)
+
+    return pred_preprocessed
+
+
+def generate_wordclouds(nmb_terms, lda, count_vect):
+
+    for index, topic in enumerate(lda.components_):
+        st.write(f'Top-{nmb_terms} words for topic #{index}')
+        #st.write(print([count_vect.get_feature_names_out()[index] for index in topic.argsort()[-nmb_terms:]]))
+
+        abs_topic = abs(topic)
+        # print(abs_topic)
+        topic_terms = [[count_vect.get_feature_names_out()[i], topic[i]] for i in
+                       abs_topic.argsort()[:-nmb_terms - 1:-1]]
+        # print(topic_terms)
+        topic_terms_sorted = [[count_vect.get_feature_names_out()[i], topic[i]] for i in
+                              abs_topic.argsort()[:-nmb_terms - 1:-1]]
+        # print(topic_terms)
+
+        topic_words = []
+        for i in range(nmb_terms):
+            topic_words.append(topic_terms_sorted[i][0])
+            # print(','.join( word for word in topic_words))
+            # print("")
+            dict_word_frequency = {}
+            for i in range(nmb_terms):
+                dict_word_frequency[topic_terms_sorted[i][0]] = topic_terms_sorted[i][1]
+
+        wcloud = WordCloud(background_color="white", mask=None, max_words=100,
+                           max_font_size=60, min_font_size=10,
+                           prefer_horizontal=0.9,
+                           contour_width=3, contour_color='black')
+        wcloud.generate_from_frequencies(dict_word_frequency)
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.imshow(wcloud)
+        plt.axis("off")
+        st.pyplot(fig)
+
 
 def run_demo(model_name, model,cv, feature):
     """ Runs the demo with the selected model and input feature"""
@@ -56,20 +117,7 @@ def run_demo(model_name, model,cv, feature):
     # show preprocessed data
     st.dataframe(pred_preprocessed)
 
-    # predicting topics with LDA model
-    st.subheader(f'Predict {model_name} on feature {feature}')
-
-    # create DTM from given feature
-    dtm = cv.transform(pred_preprocessed[feature])
-
-    # show most important words of topics found
-    for index, topic in enumerate(model.components_):
-        st.write(f'Die TOP-15 Wörter für das Thema #{index}')
-        st.write([cv.get_feature_names_out()[i] for i in topic.argsort()[-15:]])
-
-    # predict topics on corpus
-    topic_results = model.transform(dtm)
-    pred_preprocessed['topic'] = topic_results.argmax(axis=1)
+    pred_preprocessed = predict_topics(cv, feature, model, model_name, pred_preprocessed)
 
     # show dataset with topics
     st.dataframe(pred_preprocessed)
