@@ -8,4 +8,4 @@ scikit-learn
 wordcloud
 pyLDAvis
 spacy>=3.5.0,<3.6.0
-de_core_news_sm @ https://github.com/explosion/spacy-models/blob/master/meta/de_core_news_sm-3.5.0.json
+de_core_news_sm @ github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.5.0/de_core_news_sm-3.5.0.tar.gz
