@@ -7,5 +7,5 @@ joblib
 scikit-learn
 wordcloud
 pyLDAvis
-spacy>=3.0.0,<4.0.0
+spacy>=3.5.0,<3.6.0
 de_core_news_sm @ https://github.com/explosion/spacy-models/blob/master/meta/de_core_news_sm-3.5.0.json
