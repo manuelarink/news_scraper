@@ -4,8 +4,8 @@ numpy
 matplotlib
 seaborn
 joblib
-spacy>3.0.0,<4.0.0
 scikit-learn
 wordcloud
 pyLDAvis
-https://github.com/explosion/spacy-models/releases/download/de-core-news-sm-3.5.0/de-core-news-sm-3.5.0.tar.gz
+spacy>=3.0.0,<4.0.0
+de_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/de_core_news_sm_3.5.0/de_core_news_sm_3.5.0.tar.gz
