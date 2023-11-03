@@ -2,6 +2,8 @@ import streamlit as st
 
 st.set_page_config(page_title='Demo: Topic Modeling Of News')
 
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,16 +22,18 @@ from wordcloud import WordCloud
 # from pyLDAvis
 import pyLDAvis.lda_model
 
+ROOT_PATH = Path('research_demo/04_web_app')
+
 def load_data() -> pd.DataFrame:
     """ Loads the dataset with news data for topic modeling """
-    pred = pd.read_csv('00_pred_raw.csv', index_col=None)
+    pred = pd.read_csv(ROOT_PATH / '00_pred_raw.csv', index_col=None)
     pred.drop(columns=['Unnamed: 0'], axis=1, inplace=True)
     return pred
 
 def execute_preprocessing_pipe(pred) -> pd.DataFrame:
     """ Loads the preprocessing pipeline and processes the news dataframe """
     with st.status("Load preprocessing pipeline and transform data..", expanded=True) as status:
-        topic_pipe = joblib.load('topic_pipe_nosplit.joblib')
+        topic_pipe = joblib.load(ROOT_PATH / 'topic_pipe_nosplit.joblib')
         pred_preprocessed =  topic_pipe.transform(pred)
         status.update(label="Preprocessing completed!", state="complete", expanded=False)
         return pred_preprocessed
@@ -39,7 +43,7 @@ def run_demo(model_name, model,cv, feature):
 
     # Load the dataset with news data for topic modeling
     st.subheader("Loading raw data")
-    pred = pd.read_csv('00_pred_raw.csv')
+    pred = pd.read_csv(ROOT_PATH / '00_pred_raw.csv')
     pred.drop(columns=['Unnamed: 0'], axis=1, inplace=True)
 
     # show dataframe
@@ -74,7 +78,6 @@ def run_demo(model_name, model,cv, feature):
 def main():
     """ A simple demo app for Topic Modeling of News headlines"""
 
-
     # show title
     st.title("Demo: Topic Modeling with Latent Dirichlet Allocation On News Headlines")
 
@@ -93,32 +96,28 @@ def main():
         cv = None
         if features_choice == "title":
             feature = 'title_cleaned'
-            cv = joblib.load('models/cv.jl')
+            cv = joblib.load(ROOT_PATH / 'models/cv.jl')
         elif features_choice == "title, description and text":
             feature = 'title_description_text_cleaned'
-            cv = joblib.load('models/cv_combined.jl')
+            cv = joblib.load(ROOT_PATH / 'models/cv_combined.jl')
 
         lda_model = None
-        if topics_choice == "4 topics":
-            if feature == 'title_cleaned':
-                lda_model = joblib.load('models/lda_model_4_topics.jl')
-            elif feature == 'title_description_text_cleaned':
-                lda_model = joblib.load('models/lda_model_4_topics_combined.jl')
-        elif topics_choice == "6 topics":
-            if feature == 'title_cleaned':
-                lda_model = joblib.load('models/lda_model_6_topics.jl')
-            elif feature == 'title_description_text_cleaned':
-                lda_model = joblib.load('models/lda_model_6_topics_combined.jl')
-        elif topics_choice == "7 topics":
-            if feature == 'title_cleaned':
-                lda_model = joblib.load('models/lda_model_7_topics.jl')
-            elif feature == 'title_description_text_cleaned':
-                lda_model = joblib.load('models/lda_model_7_topics_combined.jl')
-        elif topics_choice == "8 topics":
-            if feature == 'title_cleaned':
-                lda_model = joblib.load('models/lda_model_8_topics.jl')
-            elif feature == 'title_description_text_cleaned':
-                lda_model = joblib.load('models/lda_model_8_topics_combined.jl')
+        model_map_title = {'4 topics' : 'lda_model_4_topics.jl',
+                           '6 topics' : 'lda_model_6_topics.jl',
+                           '7 topics' : 'lda_model_7_topics.jl',
+                           '8 topics' : 'lda_model_8_topics.jl'}
+        model_map_combined = {'4 topics' : 'lda_model_4_topics_combined.jl',
+                           '6 topics' : 'lda_model_6_topics_combined.jl',
+                           '7 topics' : 'lda_model_7_topics_combined.jl',
+                           '8 topics' : 'lda_model_8_topics_combined.jl'}
+
+        model_path = None
+        if feature == 'title_cleaned':
+            model_path = ROOT_PATH / 'models' / model_map_title[topics_choice]
+        elif feature == 'title_description_text_cleaned':
+            model_path = ROOT_PATH / 'models' / model_map_combined[topics_choice]
+        lda_model = joblib.load(model_path)
+
 
         st.info("This application shows the processing pipeline for predicting topics of news data from a trained "
                 "model using Latent Dirichlet Allocation (LDA). "
