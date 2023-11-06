@@ -2,6 +2,8 @@ import streamlit as st
 
 st.set_page_config(page_title='Demo: Topic Modeling Of News')
 
+from streamlit import components
+
 from pathlib import Path
 
 import pandas as pd
@@ -39,7 +41,7 @@ def predict_topics(cv, feature, model, model_name, pred_preprocessed) -> pd.Data
     """Predict topics with trained LDA model"""
 
     feature_txt = 'title' if feature == 'title_cleaned' else 'title, description and text'
-    st.subheader(f'Predict {model_name} on {feature_txt}')
+    st.header(f'Predict {model_name} on {feature_txt}')
 
     with st.status("Create Document-Term-Matrix...", expanded=True) as status:
         # create DTM from given feature
@@ -47,13 +49,19 @@ def predict_topics(cv, feature, model, model_name, pred_preprocessed) -> pd.Data
         # show most important words of topics found
         status.update(label="Document-Term-Matrix created.", state="complete", expanded=False)
 
+    st.subheader('Visualize topics')
     # for index, topic in enumerate(model.components_):
     #     st.write(f'Top 15 words for theme #{index}')
     #     st.write([cv.get_feature_names_out()[i] for i in topic.argsort()[-15:]])
 
-        # show 15 most important words of topics
+    # show 15 most important words of topics
     generate_wordclouds(15, model, cv)
 
+    st.subheader('Visualize model')
+    # show pyldavis - visualization
+    display_pyldavis(cv, dtm, model)
+
+    st.subheader('Predict topics on dataset')
     with st.status("Predict topics...", expanded=True) as status:
         # predict topics on corpus
         topic_results = model.transform(dtm)
@@ -61,6 +69,14 @@ def predict_topics(cv, feature, model, model_name, pred_preprocessed) -> pd.Data
         status.update(label="Prediction completed.", state="complete", expanded=False)
 
     return pred_preprocessed
+
+
+def display_pyldavis(cv, dtm, model):
+    panel = pyLDAvis.lda_model.prepare(model, dtm, cv, mds='tsne')
+    pyLDAvis.save_html(panel, 'lda.html')
+    with open('./lda.html', 'r') as f:
+        html_string = f.read()
+    st.components.v1.html(html_string, width=1300, height=800, scrolling=False)
 
 
 def generate_wordclouds(nmb_terms, lda, count_vect):
@@ -103,7 +119,7 @@ def run_demo(model_name, model,cv, feature):
     """ Runs the demo with the selected model and input feature"""
 
     # Load the dataset with news data for topic modeling
-    st.subheader("Loading raw data")
+    st.header("Load raw data")
     pred = pd.read_csv(ROOT_PATH / '00_pred_raw.csv')
     pred.drop(columns=['Unnamed: 0'], axis=1, inplace=True)
 
@@ -111,7 +127,7 @@ def run_demo(model_name, model,cv, feature):
     st.dataframe(pred)
 
     # execute preprocessing pipeline
-    st.subheader("Preprocessing data")
+    st.header("Preprocess data")
     pred_preprocessed = execute_preprocessing_pipe(pred)
 
     # show preprocessed data
@@ -184,7 +200,7 @@ def main():
 
 
     elif choice == "Evaluation / Visualization":
-        st.subheader("Evaluation and Visualization of the results of LDA")
+        st.header("Evaluation and Visualization of the results of LDA")
         st.info('Work on this is still in progress - please visit later.')
 
 
